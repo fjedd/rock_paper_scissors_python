@@ -1,21 +1,50 @@
 #!/bin/python3
-
-import random, pyfiglet, time, enum
-
-choice_table = ['rock', 'paper', 'scissors']
+from enum import IntEnum
+import random, time
 
 class Game(IntEnum):
-    rock = 1 
-    paper = 2
-    scissors = 3
+    Rock = 0
+    Paper = 1
+    Scissors = 2
 
-def rock_paper_scissors():
-    player = input(pyfiglet.figlet_format("Hello there! Pick rock [1] paper [2] or scissors [3]!"))
-    choice = int(player)
-    action = Game.choice
-    computer_choice  = random.choice(choice_table)
-    return action      
-        
+results = {
+        Game.Rock : [Game.Scissors],
+        Game.Scissors : [Game.Paper],
+        Game.Paper : [Game.Rock]
+        }
 
+def player_selection():
+    options = [f"{option.name} [{option.value}]" for option in Game]
+    player_choice = int(input(f"Enter your choice: {options}\n"))    
+    player = Game(player_choice)
+    print("Computer is thinking...")
+    time.sleep(2)
+    return player
 
-rock_paper_scissors()
+def computer_selection():
+    computer_choice = random.randint(0,2)
+    computer = Game(computer_choice)
+    return computer 
+
+def choose_winner(player, computer):
+    computer_won = results[player]
+    if player == computer:
+       print(f"It's a draw! Both of you selected: {player.name}!")
+    elif computer in computer_won:
+       print(f"You lost! {computer.name} beats {player.name}. Try again!")
+    else:
+        print(f"You won! {player.name} beats {computer.name}! Congratulations!")
+
+while True:
+    try:
+        you = player_selection()
+    except ValueError as e:
+        choice_range = f"(0, {len(Game) - 1})"
+        print(f"You have to pick number in range: {choice_range}.")
+        continue
+    comp = computer_selection()
+    choose_winner(you, comp)
+
+    and_another_one = input("Do you want to play again? Y/N\n")
+    if and_another_one.upper() != "Y":
+        break
